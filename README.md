@@ -1,56 +1,116 @@
-# React + TypeScript + Vite
+# momo商品價格追蹤器 (Trace-Price)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+到價通知・歷史價格趨勢  
+因為 momo App 的通知太多，無法只針對我關心的商品是否有降價，所以我開發了這個專案。  
+使用者可以自行設定想追蹤的商品與目標價格，系統會每天自動爬取最新價格，當價格低於設定值時會發送通知，並同時保留歷史價格走勢以供查看。 
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 功能特色
 
-## Expanding the ESLint configuration
+- **會員系統**
+  - 註冊 / 登入（JWT 驗證）
+  - 個人追蹤清單管理
+- **價格追蹤**
+  - 輸入商品網址，自動爬取商品名稱、圖片與價格
+  - 設定目標價，到價自動通知（整合 n8n Webhook）
+  - 商品歷史價格趨勢紀錄
+- **自動化**
+  - `node-cron` 每日定時爬取最新價格
+  - 自動寫入 MongoDB 並檢查是否觸發通知
+- **前端介面**
+  - React + TailwindCSS 開發
+  - 登入 / 註冊頁面
+  - Dashboard 管理商品追蹤清單
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 技術棧
+
+**前端**
+- React (TypeScript)
+- React Hook Form
+- React Router
+- TailwindCSS
+
+**後端**
+- Node.js + Express
+- MongoDB + Mongoose
+- node-cron (排程任務)
+- JWT + bcrypt (身份驗證與加密)
+- n8n Webhook (爬蟲 ＋ 外部通知整合)
+
+---
+
+## 技術架構
+
+### 前端 (React + TypeScript)
+- React Router v6
+- Recharts (價格趨勢圖表)
+- TailwindCSS / CSS
+- React-Toastify (通知)
+---
+
+### 後端 (Node.js + Express)
+- JWT 驗證 (登入/註冊)
+- RESTful API
+- MongoDB + Mongoose Schema
+- n8n webHook + gmail api
+- node-cron (排程任務)
+---
+
+## 安裝與執行
+
+### 1. Clone 專案
+```bash
+git clone https://github.com/your-username/trace-price.git
+cd trace-price
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+### 2. 安裝依賴
+前端：
+```bash
+cd client
+npm install
 ```
-# trace-price
-"# trace-price-client" 
+
+後端：
+```bash
+cd server
+npm install
+```
+
+### 3. 環境變數設定
+建立 `.env` 檔案：
+
+```env
+PORT=3001
+MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/trace-price
+JWT_SECRET=your_jwt_secret
+
+SMTP_HOST=smtp.mailtrap.io
+SMTP_PORT=2525
+SMTP_USER=your_smtp_user
+SMTP_PASS=your_smtp_pass
+```
+
+### 4. 啟動專案
+後端：
+```bash
+cd server
+npm run start
+```
+
+前端：
+```bash
+cd client
+npm run dev
+```
+
+### 5. 開發測試
+- 註冊帳號並登入
+- 在 Dashboard 輸入商品網址，新增追蹤
+- 爬蟲會自動擷取商品資訊，並每日更新價格
+
+---
+
